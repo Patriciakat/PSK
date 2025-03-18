@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <h:head>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+            .form { margin-bottom: 15px; }
+            .form label { display: block; margin-bottom: 5px; }
+            .form input { padding: 5px; width: 300px; }
+            .btn { padding: 8px 16px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+            .nav { margin-top: 20px; padding-top: 10px; border-top: 1px solid #ddd; }
+        </style>
+    </h:head>
+</h:head>
+<h:body>
+    <h1>Students</h1>
+
+    <!-- List of all students -->
+    <h:form id="studentsList">
+        <h:dataTable value="#{studentBean.students}" var="student">
+            <h:column>
+                <f:facet name="header">ID</f:facet>
+                #{student.id}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Name</f:facet>
+                #{student.name}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Student code</f:facet>
+                #{student.code}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Degree</f:facet>
+                #{student.degree.title}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Exams</f:facet>
+                <ui:repeat value="#{student.exams}" var="exam">
+                    #{exam.title}<br/>
+                </ui:repeat>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Actions</f:facet>
+                <h:commandButton value="View" action="#{studentBean.selectStudent(student.id)}" styleClass="btn"/>
+                <h:commandButton value="Delete"
+                                 action="#{studentBean.deleteStudent(student.id)}"
+                                 styleClass="btn"
+                                 onclick="return confirm('Are you sure you want to delete this student?');">
+                                <f:ajax execute="@this" render="@form" />
+                </h:commandButton>
+            </h:column>
+        </h:dataTable>
+    </h:form>
+
+    <h2>Add New Student</h2>
+    <h:form id="addStudentForm">
+        <div class="form">
+            <h:outputLabel for="name">Name:</h:outputLabel>
+            <h:inputText id="name" value="#{studentBean.newStudent.name}" required="true" />
+        </div>
+        <div class="form">
+            <h:outputLabel for="studentId">Student code:</h:outputLabel>
+            <h:inputText id="studentId" value="#{studentBean.newStudent.code}" required="true" />
+        </div>
+        <div class="form">
+            <h:outputLabel for="degree">Degree:</h:outputLabel>
+            <h:selectOneMenu id="degree" value="#{studentBean.selectedDegreeId}" required="true">
+                <f:selectItems value="#{degreeBean.degreesForSelect}" />
+            </h:selectOneMenu>
+        </div>
+        <h:commandButton value="Add Student" action="#{studentBean.createStudent}" styleClass="btn"/>
+    </h:form>
+
+    <!-- Selected student DETAILS section -->
+    <h:panelGroup rendered="#{studentBean.selectedStudent != null}" styleClass="section student-details">
+        <h2>Student Details: #{studentBean.selectedStudent.name}</h2>
+
+        <div>
+            <p><strong>ID:</strong> #{studentBean.selectedStudent.id}</p>
+            <p><strong>Name:</strong> #{studentBean.selectedStudent.name}</p>
+            <p><strong>Student Code:</strong> #{studentBean.selectedStudent.code}</p>
+            <p><strong>Degree:</strong> #{studentBean.selectedStudent.degree.title}</p>
+        </div>
+        <h:commandButton value="Delete"
+                         action="#{studentBean.deleteStudent(student.id)}"
+                         styleClass="btn"
+                         onclick="return confirm('Are you sure you want to delete this student?');">
+            <f:ajax execute="@this" render="@form" />
+        </h:commandButton>
+
+        <h3>Enrolled Exams</h3>
+        <h:panelGroup rendered="#{not empty studentBean.selectedStudent.exams}">
+            <h:form id="enrolledExamsForm">
+                <h:dataTable value="#{studentBean.selectedStudent.exams}" var="exam" styleClass="student-table">
+                    <h:column>
+                        <f:facet name="header">ID</f:facet>
+                        #{exam.id}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Name</f:facet>
+                        #{exam.title}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Score</f:facet>
+                        #{exam.score}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Actions</f:facet>
+                        <h:commandButton value="Withdraw"
+                                         action="#{studentBean.withdrawFromExam(exam.id)}"
+                                         styleClass="btn" />
+                    </h:column>
+                </h:dataTable>
+            </h:form>
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{empty studentBean.selectedStudent.exams}">
+            <p>This student is not enrolled in any exams.</p>
+        </h:panelGroup>
+
+        <h3>Enroll in Exam</h3>
+        <h:form id="enrollExamForm">
+            <div class="form-group">
+                <h:outputLabel for="examSelect" value="Select Exam:" />
+                <h:selectOneMenu id="examSelect" value="#{studentBean.selectedExamId}">
+                    <f:selectItem itemLabel="Exam" itemValue="" />
+                    <f:selectItems value="#{studentBean.availableExams}" var="exam"
+                                   itemValue="#{exam.id}" itemLabel="#{exam.title}" />
+                </h:selectOneMenu>
+            </div>
+
+            <h:commandButton value="Enroll" action="#{studentBean.enrollInExam()}"
+                             styleClass="btn" />
+        </h:form>
+    </h:panelGroup>
+
+    <div class="nav">
+        <h:link outcome="degrees" value="View All Degrees" /> |
+        <h:link outcome="exams" value="View All Exams" /> |
+        <h:link outcome="index" value="Back to Home" />
+    </div>
+</h:body>
+</html>

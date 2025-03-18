@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; }
+        .form-group input { padding: 5px; width: 300px; }
+        .btn { padding: 8px 16px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+        .nav { margin-top: 20px; padding-top: 10px; border-top: 1px solid #ddd; }
+    </style>
+</h:head>
+<h:body>
+    <h1>Degrees</h1>
+
+    <!-- List of all degrees -->
+    <h:form id="degreesList">
+        <h:dataTable value="#{degreeBean.degrees}" var="degree">
+            <h:column>
+                <f:facet name="header">ID</f:facet>
+                #{degree.id}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Title</f:facet>
+                #{degree.title}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Students</f:facet>
+                #{degree.students.size()}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Actions</f:facet>
+                <h:commandButton value="Delete" action="#{degreeBean.deleteDegree(degree.id)}"
+                                 styleClass="btn"
+                                 onclick="return confirm('Are you sure?');" />
+<!--                <h:commandButton value="View Students" action="#{degreeBean.selectDegree(degree.id)}"-->
+<!--                                 styleClass="btn" />-->
+            </h:column>
+        </h:dataTable>
+    </h:form>
+
+    <!-- Add new degree form -->
+    <h2>Add New Degree</h2>
+    <h:form id="addDegreeForm">
+        <div class="form-group">
+            <h:outputLabel for="title">Title: </h:outputLabel>
+            <h:inputText id="title" value="#{degreeBean.newDegree.title}" required="true" />
+        </div>
+        <h:commandButton value="Add Degree" action="#{degreeBean.createDegree}" styleClass="btn" />
+    </h:form>
+
+    <div class="nav">
+        <h:link outcome="students" value="View All Students" /> |
+        <h:link outcome="exams" value="View All Exams" /> |
+        <h:link outcome="index" value="Back to Home" />
+    </div>
+</h:body>
+</html>

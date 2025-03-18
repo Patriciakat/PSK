@@ -1,0 +1,22 @@
+<mapper namespace="com.example.psk.DAO.StudentMapper">
+    <select id="findAll" resultType="com.example.psk.entities.Student">
+        SELECT * FROM STUDENT
+    </select>
+
+    <select id="findById" parameterType="long" resultType="com.example.psk.entities.Student">
+        SELECT * FROM STUDENT WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.example.psk.entities.Student">
+        INSERT INTO STUDENT (id, name, studentId, degree_id)
+        VALUES (#{id}, #{name}, #{studentId}, #{degree.id})
+    </insert>
+
+    <update id="update" parameterType="com.example.psk.entities.Student">
+        UPDATE STUDENT SET name=#{name}, studentId=#{studentId}, degree_id=#{degree.id} WHERE id=#{id}
+    </update>
+
+    <delete id="delete" parameterType="long">
+        DELETE FROM STUDENT WHERE id=#{id}
+    </delete>
+</mapper>
